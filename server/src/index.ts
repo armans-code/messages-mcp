@@ -1,6 +1,6 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
-import { getOutboundMessages } from "./queries.js";
+import { getOutboundMessages } from "./data.js";
 import { z } from "zod";
 
 // Create server instance
@@ -46,7 +46,6 @@ main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
-
 
 // we have all the imessage data. here's some idea features:
 // get alarms from messaging yourself

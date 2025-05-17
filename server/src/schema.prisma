@@ -19,8 +19,8 @@ model SqliteDatabaseProperties {
 model attachment {
   ROWID                          Int                       @id @default(autoincrement())
   guid                           String                    @unique(map: "sqlite_autoindex_attachment_1")
-  created_date                   Int?                      @default(0)
-  start_date                     Int?                      @default(0)
+  created_date                   BigInt?                     @default(0)
+  start_date                     BigInt?                     @default(0)
   filename                       String?
   uti                            String?
   mime_type                      String?
@@ -67,11 +67,11 @@ model chat {
   server_change_token           String?
   ck_sync_state                 Int?                            @default(0)
   original_group_id             String?
-  last_read_message_timestamp   Int?                            @default(0)
+  last_read_message_timestamp   BigInt?                            @default(0)
   cloudkit_record_id            String?
   last_addressed_sim_id         String?
   is_blackholed                 Int?                            @default(0)
-  syndication_date              Int?                            @default(0)
+  syndication_date              BigInt?                            @default(0)
   syndication_type              Int?                            @default(0)
   is_recovered                  Int?                            @default(0)
   is_deleting_incoming_messages Int?                            @default(0)
@@ -103,7 +103,7 @@ model chat_handle_join {
 model chat_message_join {
   chat_id      Int
   message_id   Int
-  message_date Int?     @default(0)
+  message_date BigInt?     @default(0)
   message      message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
   chat         chat?    @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
 
@@ -118,7 +118,7 @@ model chat_message_join {
 model chat_recoverable_message_join {
   chat_id       Int
   message_id    Int
-  delete_date   Int?
+  delete_date   BigInt?
   ck_sync_state Int?     @default(0)
   message       message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
   chat          chat?    @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
@@ -167,9 +167,9 @@ model message {
   account                           String?
   account_guid                      String?
   error                             Int?                            @default(0)
-  date                              Int?
-  date_read                         Int?
-  date_delivered                    Int?
+  date                              BigInt?
+  date_read                         BigInt?
+  date_delivered                    BigInt?
   is_delivered                      Int?                            @default(0)
   is_finished                       Int?                            @default(0)
   is_emote                          Int?                            @default(0)
@@ -192,7 +192,7 @@ model message {
   was_deduplicated                  Int?                            @default(0)
   is_audio_message                  Int?                            @default(0)
   is_played                         Int?                            @default(0)
-  date_played                       Int?
+  date_played                       BigInt?
   item_type                         Int?                            @default(0)
   other_handle                      Int?                            @default(0)
   group_title                       String?
@@ -210,7 +210,7 @@ model message {
   expressive_send_style_id          String?
   associated_message_range_location Int?                            @default(0)
   associated_message_range_length   Int?                            @default(0)
-  time_expressive_send_played       Int?
+  time_expressive_send_played       BigInt?
   message_summary_info              Bytes?
   ck_sync_state                     Int?                            @default(0)
   ck_record_id                      String?
@@ -227,8 +227,8 @@ model message {
   synced_syndication_ranges         String?
   was_delivered_quietly             Int?                            @default(0)
   did_notify_recipient              Int?                            @default(0)
-  date_retracted                    Int?
-  date_edited                       Int?
+  date_retracted                    BigInt?
+  date_edited                       BigInt?
   was_detonated                     Int?                            @default(0)
   part_count                        Int?
   is_stewie                         Int?                            @default(0)
@@ -290,7 +290,7 @@ model recoverable_message_part {
   chat_id       Int
   message_id    Int
   part_index    Int
-  delete_date   Int?
+  delete_date   BigInt?
   part_text     Bytes
   ck_sync_state Int?     @default(0)
   message       message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
