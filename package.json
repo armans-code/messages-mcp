@@ -1,5 +1,8 @@
 {
   "devDependencies": {
     "@types/node": "^22.15.18"
+  },
+  "dependencies": {
+    "tailwindcss-animate": "^1.0.7"
   }
 }
