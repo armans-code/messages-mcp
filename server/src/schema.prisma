@@ -1,0 +1,333 @@
+ generator client {
+  provider = "prisma-client-js"
+}
+
+datasource db {
+  provider = "sqlite"
+  url      = "file:./chat.db"
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model SqliteDatabaseProperties {
+  key   String? @unique(map: "sqlite_autoindex__SqliteDatabaseProperties_1")
+  value String?
+
+  @@map("_SqliteDatabaseProperties")
+  @@ignore
+}
+
+model attachment {
+  ROWID                          Int                       @id @default(autoincrement())
+  guid                           String                    @unique(map: "sqlite_autoindex_attachment_1")
+  created_date                   Int?                      @default(0)
+  start_date                     Int?                      @default(0)
+  filename                       String?
+  uti                            String?
+  mime_type                      String?
+  transfer_state                 Int?                      @default(0)
+  is_outgoing                    Int?                      @default(0)
+  user_info                      Bytes?
+  transfer_name                  String?
+  total_bytes                    Int?                      @default(0)
+  is_sticker                     Int?                      @default(0)
+  sticker_user_info              Bytes?
+  attribution_info               Bytes?
+  hide_attachment                Int?                      @default(0)
+  ck_sync_state                  Int?                      @default(0)
+  ck_server_change_token_blob    Bytes?
+  ck_record_id                   String?
+  original_guid                  String                    @unique(map: "sqlite_autoindex_attachment_2")
+  is_commsafety_sensitive        Int?                      @default(0)
+  emoji_image_content_identifier String?
+  emoji_image_short_description  String?
+  preview_generation_state       Int?                      @default(0)
+  message_attachment_join        message_attachment_join[] @ignore
+
+  @@index([is_sticker], map: "attachment_idx_is_sticker")
+}
+
+model chat {
+  ROWID                         Int                             @id @default(autoincrement())
+  guid                          String                          @unique(map: "sqlite_autoindex_chat_1")
+  style                         Int?
+  state                         Int?
+  account_id                    String?
+  properties                    Bytes?
+  chat_identifier               String?
+  service_name                  String?
+  room_name                     String?
+  account_login                 String?
+  is_archived                   Int?                            @default(0)
+  last_addressed_handle         String?
+  display_name                  String?
+  group_id                      String?
+  is_filtered                   Int?                            @default(0)
+  successful_query              Int?
+  engram_id                     String?
+  server_change_token           String?
+  ck_sync_state                 Int?                            @default(0)
+  original_group_id             String?
+  last_read_message_timestamp   Int?                            @default(0)
+  cloudkit_record_id            String?
+  last_addressed_sim_id         String?
+  is_blackholed                 Int?                            @default(0)
+  syndication_date              Int?                            @default(0)
+  syndication_type              Int?                            @default(0)
+  is_recovered                  Int?                            @default(0)
+  is_deleting_incoming_messages Int?                            @default(0)
+  chat_handle_join              chat_handle_join[]              @ignore
+  chat_message_join             chat_message_join[]             @ignore
+  chat_recoverable_message_join chat_recoverable_message_join[] @ignore
+  recoverable_message_part      recoverable_message_part[]      @ignore
+
+  @@index([group_id], map: "chat_idx_group_id")
+  @@index([is_archived], map: "chat_idx_is_archived")
+  @@index([room_name, service_name], map: "chat_idx_chat_room_name_service_name")
+  @@index([chat_identifier], map: "chat_idx_chat_identifier")
+  @@index([chat_identifier, service_name], map: "chat_idx_chat_identifier_service_name")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model chat_handle_join {
+  chat_id   Int?
+  handle_id Int?
+  handle    handle? @relation(fields: [handle_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+  chat      chat?   @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([chat_id, handle_id], map: "sqlite_autoindex_chat_handle_join_1")
+  @@index([handle_id], map: "chat_handle_join_idx_handle_id")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model chat_message_join {
+  chat_id      Int
+  message_id   Int
+  message_date Int?     @default(0)
+  message      message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+  chat         chat?    @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([chat_id, message_id])
+  @@index([chat_id, message_date, message_id], map: "chat_message_join_idx_message_date_id_chat_id")
+  @@index([chat_id], map: "chat_message_join_idx_chat_id")
+  @@index([message_id], map: "chat_message_join_idx_message_id_only")
+  @@ignore
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model chat_recoverable_message_join {
+  chat_id       Int
+  message_id    Int
+  delete_date   Int?
+  ck_sync_state Int?     @default(0)
+  message       message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+  chat          chat?    @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([chat_id, message_id])
+  @@index([message_id])
+  @@ignore
+}
+
+model deleted_messages {
+  ROWID Int    @id @unique(map: "sqlite_autoindex_deleted_messages_1") @default(autoincrement())
+  guid  String
+}
+
+model handle {
+  ROWID              Int                @id @unique(map: "sqlite_autoindex_handle_1") @default(autoincrement())
+  id                 String
+  country            String?
+  service            String
+  uncanonicalized_id String?
+  person_centric_id  String?
+  chat_handle_join   chat_handle_join[] @ignore
+
+  @@unique([id, service], map: "sqlite_autoindex_handle_2")
+}
+
+model kvtable {
+  ROWID Int    @id @unique(map: "sqlite_autoindex_kvtable_1") @default(autoincrement())
+  key   String @unique(map: "sqlite_autoindex_kvtable_2")
+  value Bytes
+}
+
+model message {
+  ROWID                             Int                             @id @default(autoincrement())
+  guid                              String                          @unique(map: "sqlite_autoindex_message_1")
+  text                              String?
+  replace                           Int?                            @default(0)
+  service_center                    String?
+  handle_id                         Int?                            @default(0)
+  subject                           String?
+  country                           String?
+  attributedBody                    Bytes?
+  version                           Int?                            @default(0)
+  type                              Int?                            @default(0)
+  service                           String?
+  account                           String?
+  account_guid                      String?
+  error                             Int?                            @default(0)
+  date                              Int?
+  date_read                         Int?
+  date_delivered                    Int?
+  is_delivered                      Int?                            @default(0)
+  is_finished                       Int?                            @default(0)
+  is_emote                          Int?                            @default(0)
+  is_from_me                        Int?                            @default(0)
+  is_empty                          Int?                            @default(0)
+  is_delayed                        Int?                            @default(0)
+  is_auto_reply                     Int?                            @default(0)
+  is_prepared                       Int?                            @default(0)
+  is_read                           Int?                            @default(0)
+  is_system_message                 Int?                            @default(0)
+  is_sent                           Int?                            @default(0)
+  has_dd_results                    Int?                            @default(0)
+  is_service_message                Int?                            @default(0)
+  is_forward                        Int?                            @default(0)
+  was_downgraded                    Int?                            @default(0)
+  is_archive                        Int?                            @default(0)
+  cache_has_attachments             Int?                            @default(0)
+  cache_roomnames                   String?
+  was_data_detected                 Int?                            @default(0)
+  was_deduplicated                  Int?                            @default(0)
+  is_audio_message                  Int?                            @default(0)
+  is_played                         Int?                            @default(0)
+  date_played                       Int?
+  item_type                         Int?                            @default(0)
+  other_handle                      Int?                            @default(0)
+  group_title                       String?
+  group_action_type                 Int?                            @default(0)
+  share_status                      Int?                            @default(0)
+  share_direction                   Int?                            @default(0)
+  is_expirable                      Int?                            @default(0)
+  expire_state                      Int?                            @default(0)
+  message_action_type               Int?                            @default(0)
+  message_source                    Int?                            @default(0)
+  associated_message_guid           String?
+  associated_message_type           Int?                            @default(0)
+  balloon_bundle_id                 String?
+  payload_data                      Bytes?
+  expressive_send_style_id          String?
+  associated_message_range_location Int?                            @default(0)
+  associated_message_range_length   Int?                            @default(0)
+  time_expressive_send_played       Int?
+  message_summary_info              Bytes?
+  ck_sync_state                     Int?                            @default(0)
+  ck_record_id                      String?
+  ck_record_change_tag              String?
+  destination_caller_id             String?
+  is_corrupt                        Int?                            @default(0)
+  reply_to_guid                     String?
+  sort_id                           Int?
+  is_spam                           Int?                            @default(0)
+  has_unseen_mention                Int?                            @default(0)
+  thread_originator_guid            String?
+  thread_originator_part            String?
+  syndication_ranges                String?
+  synced_syndication_ranges         String?
+  was_delivered_quietly             Int?                            @default(0)
+  did_notify_recipient              Int?                            @default(0)
+  date_retracted                    Int?
+  date_edited                       Int?
+  was_detonated                     Int?                            @default(0)
+  part_count                        Int?
+  is_stewie                         Int?                            @default(0)
+  is_sos                            Int?                            @default(0)
+  is_critical                       Int?                            @default(0)
+  bia_reference_id                  String?
+  is_kt_verified                    Int?                            @default(0)
+  fallback_hash                     String?
+  associated_message_emoji          String?
+  is_pending_satellite_send         Int?                            @default(0)
+  needs_relay                       Int?                            @default(0)
+  schedule_type                     Int?                            @default(0)
+  schedule_state                    Int?                            @default(0)
+  sent_or_received_off_grid         Int?                            @default(0)
+  chat_message_join                 chat_message_join[]             @ignore
+  chat_recoverable_message_join     chat_recoverable_message_join[] @ignore
+  message_attachment_join           message_attachment_join[]       @ignore
+  recoverable_message_part          recoverable_message_part[]      @ignore
+
+  @@index([is_finished, is_from_me, error], map: "message_idx_failed")
+  @@index([is_read, is_from_me, item_type], map: "message_idx_isRead_isFromMe_itemType")
+  @@index([is_read, is_from_me, is_finished], map: "message_idx_is_read")
+  @@index([expire_state], map: "message_idx_expire_state")
+  @@index([was_downgraded], map: "message_idx_was_downgraded")
+  @@index([other_handle], map: "message_idx_other_handle")
+  @@index([cache_has_attachments], map: "message_idx_cache_has_attachments")
+  @@index([schedule_state], map: "message_idx_schedule_state")
+  @@index([associated_message_guid], map: "message_idx_associated_message")
+  @@index([is_sent, is_from_me, error], map: "message_idx_is_sent_is_from_me_error")
+  @@index([handle_id], map: "message_idx_handle_id")
+  @@index([handle_id, date], map: "message_idx_handle")
+  @@index([thread_originator_guid], map: "message_idx_thread_originator_guid")
+  @@index([date], map: "message_idx_date")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model message_attachment_join {
+  message_id    Int?
+  attachment_id Int?
+  attachment    attachment? @relation(fields: [attachment_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+  message       message?    @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@unique([message_id, attachment_id], map: "sqlite_autoindex_message_attachment_join_1")
+  @@index([attachment_id], map: "message_attachment_join_idx_attachment_id")
+  @@index([message_id], map: "message_attachment_join_idx_message_id")
+  @@ignore
+}
+
+model message_processing_task {
+  ROWID      Int    @id @unique(map: "sqlite_autoindex_message_processing_task_1") @default(autoincrement())
+  guid       String
+  task_flags Int
+
+  @@index([guid, task_flags], map: "message_processing_task_idx_guid_task_flags")
+}
+
+/// The underlying table does not contain a valid unique identifier and can therefore currently not be handled by Prisma Client.
+model recoverable_message_part {
+  chat_id       Int
+  message_id    Int
+  part_index    Int
+  delete_date   Int?
+  part_text     Bytes
+  ck_sync_state Int?     @default(0)
+  message       message? @relation(fields: [message_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+  chat          chat?    @relation(fields: [chat_id], references: [ROWID], onDelete: Cascade, onUpdate: NoAction)
+
+  @@id([chat_id, message_id, part_index])
+  @@ignore
+}
+
+model scheduled_messages_pending_cloudkit_delete {
+  ROWID    Int     @id @unique(map: "sqlite_autoindex_scheduled_messages_pending_cloudkit_delete_1") @default(autoincrement())
+  guid     String
+  recordID String?
+}
+
+model sync_deleted_attachments {
+  ROWID    Int     @id @unique(map: "sqlite_autoindex_sync_deleted_attachments_1") @default(autoincrement())
+  guid     String
+  recordID String?
+}
+
+model sync_deleted_chats {
+  ROWID     Int     @id @unique(map: "sqlite_autoindex_sync_deleted_chats_1") @default(autoincrement())
+  guid      String
+  recordID  String?
+  timestamp Int?
+}
+
+model sync_deleted_messages {
+  ROWID    Int     @id @unique(map: "sqlite_autoindex_sync_deleted_messages_1") @default(autoincrement())
+  guid     String
+  recordID String?
+}
+
+model unsynced_removed_recoverable_messages {
+  ROWID        Int    @id @unique(map: "sqlite_autoindex_unsynced_removed_recoverable_messages_1") @default(autoincrement())
+  chat_guid    String
+  message_guid String
+  part_index   Int?
+}
