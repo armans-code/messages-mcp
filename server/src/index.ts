@@ -1,17 +1,18 @@
 import { McpServer } from "@modelcontextprotocol/sdk/server/mcp.js";
 import { StdioServerTransport } from "@modelcontextprotocol/sdk/server/stdio.js";
+import { getOutboundMessages } from "./queries.js";
 import { z } from "zod";
 
 // Create server instance
 const server = new McpServer({
-  name: "take-screenshot",
+  name: "imessage-assistant",
   version: "1.0.0",
   capabilities: {
     resources: {
-      screenshot: {
-        description: "A screenshot of a website",
+      messages: {
+        description: "Get messages that the user has sent",
         schema: z.object({
-          url: z.string().url(),
+          messages: z.array(z.string()),
         }),
       },
     },
@@ -19,27 +20,17 @@ const server = new McpServer({
 });
 
 server.tool(
-  "take-screenshot",
-  "Take a screenshot of a website",
+  "get-outbound-messages",
+  "Get all messages that the user has sent",
   {
-    url: z
-      .string()
-      .url()
-      .describe(
-        "The URL of the website to screenshot. For example, http://localhost:3000"
-      ),
+    take: z.number().optional(),
   },
-  async ({ url }, _extra) => {
-    // do something with url
+  async ({ take = 10 }, _extra) => {
+    const messages = await getOutboundMessages({ take });
 
     return {
       structuredContent: {
-        image: {
-          //   data: screenshotBuffer,
-          mimeType: "image/png",
-          encoding: "base64",
-        },
-        text: "This is a screenshot for a page you requested:",
+        text: JSON.stringify(messages),
       },
     };
   }
@@ -48,10 +39,28 @@ server.tool(
 async function main() {
   const transport = new StdioServerTransport();
   await server.connect(transport);
-  console.error("Website screenshot MCP Server running on stdio");
+  console.error("MCP Server running on stdio");
 }
 
 main().catch((error) => {
   console.error("Fatal error in main():", error);
   process.exit(1);
 });
+
+
+// we have all the imessage data. here's some idea features:
+// get alarms from messaging yourself
+// track when you forget to respond to messages
+// add a gcal event from a message
+// analyze sentiment of conversations over time
+// summarize long message threads
+// detect and highlight important dates or deadlines mentioned
+// auto-generate message replies based on context
+// visualize messaging frequency with different contacts
+// extract and save shared links or files
+// detect group chat decisions or polls
+// remind you to follow up on unanswered questions
+// search messages by topic or sentiment
+// detect and alert for scam or spam messages
+// auto-tag messages with custom labels
+// integrate with task managers to create todos from messages

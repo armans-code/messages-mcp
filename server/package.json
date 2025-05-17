@@ -13,11 +13,13 @@
   "dependencies": {
     "@modelcontextprotocol/sdk": "^1.11.4",
     "@prisma/client": "^6.8.2",
+    "@prisma/adapter-better-sqlite3": "^6.8.2",
     "better-sqlite3": "^11.10.0",
     "zod": "^3.24.4"
   },
   "devDependencies": {
     "@types/node": "^22.15.18",
+    "prisma": "^6.8.2",
     "typescript": "^5.8.3"
   },
   "type": "module",
