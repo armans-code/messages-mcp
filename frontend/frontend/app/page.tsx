@@ -63,10 +63,11 @@ export default function ChatPage() {
   if (!mounted) return null;
 
   return (
-    <div className="flex flex-col h-screen bg-gradient-to-b from-gray-900 to-black text-zinc-100">
-      <div className="bg-gradient-to-r from-blue-600/20 via-purple-500/10 to-blue-600/20 h-1 w-full"></div>
+    <div className="flex flex-col h-screen bg-[#0c111b] text-zinc-100">
+      <div className="absolute inset-0 bg-gradient-radial from-blue-900/10 via-transparent to-transparent opacity-30"></div>
+      <div className="bg-gradient-to-r from-blue-600/20 via-indigo-500/20 to-blue-600/20 h-[2px] w-full"></div>
 
-      <main className="flex-1 overflow-hidden relative">
+      <main className="flex-1 overflow-hidden relative z-10">
         <div className="absolute inset-0 overflow-y-auto py-8 px-6 pb-24">
           {messages.length === 0 ? (
             <EmptyState />
@@ -80,7 +81,10 @@ export default function ChatPage() {
                       key={message.id}
                       initial={{ opacity: 0, y: 20 }}
                       animate={{ opacity: 1, y: 0 }}
-                      transition={{ duration: 0.3 }}
+                      transition={{
+                        duration: 0.4,
+                        ease: [0.25, 0.1, 0.25, 1.0],
+                      }}
                       className={cn(
                         "flex",
                         message.role === "user"
@@ -115,7 +119,7 @@ export default function ChatPage() {
                   animate={{ opacity: 1, y: 0 }}
                   className="flex justify-start"
                 >
-                  <div className="bg-gray-800 rounded-2xl p-4 max-w-[80%] shadow-md border border-gray-700/60">
+                  <div className="bg-[#1a2231] rounded-2xl p-4 max-w-[80%] shadow-md border border-gray-800">
                     <TypingIndicator />
                   </div>
                 </motion.div>
@@ -127,38 +131,38 @@ export default function ChatPage() {
       </main>
 
       <div className="relative z-10">
-        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-gray-900 via-gray-900 to-transparent pt-8">
+        <div className="fixed bottom-0 left-0 right-0 bg-gradient-to-t from-[#0c111b] via-[#0c111b] to-transparent pt-16">
           <div className="mx-auto max-w-2xl px-6 pb-6">
-            <form
-              onSubmit={onSubmit}
-              className="relative bg-gray-800 rounded-xl p-2 border border-gray-700/50 shadow-lg"
-            >
-              <input
-                type="text"
-                value={input}
-                onChange={handleInputChange}
-                placeholder="Ask about your messages..."
-                className="w-full bg-transparent py-3 px-4 pr-16 focus:outline-none text-zinc-100 placeholder:text-zinc-400"
-              />
-              <div className="absolute right-4 top-1/2 -translate-y-1/2 flex space-x-2">
-                <button
-                  type="button"
-                  className="p-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors"
-                >
-                  <Mic size={18} />
-                </button>
-                <button
-                  type="submit"
-                  disabled={!input.trim() || isLoading}
-                  className={cn(
-                    "p-2 rounded-full transition-all duration-300",
-                    input.trim() && !isLoading
-                      ? "bg-blue-500 hover:bg-blue-600 text-white"
-                      : "bg-gray-700 text-zinc-400"
-                  )}
-                >
-                  <Send size={18} />
-                </button>
+            <form onSubmit={onSubmit} className="relative group">
+              <div className="absolute -inset-0.5 rounded-full bg-gradient-to-r from-blue-500/30 to-indigo-500/30 opacity-0 group-focus-within:opacity-100 transition-opacity duration-300"></div>
+              <div className="relative flex items-center bg-[#1a2231] rounded-full p-1.5 border border-[#2a3343] shadow-lg">
+                <input
+                  type="text"
+                  value={input}
+                  onChange={handleInputChange}
+                  placeholder="Ask about your messages..."
+                  className="w-full bg-transparent py-3 px-5 focus:outline-none text-zinc-100 placeholder:text-zinc-400 rounded-full"
+                />
+                <div className="flex gap-1 pr-2">
+                  <button
+                    type="button"
+                    className="p-2 rounded-full text-zinc-400 hover:text-zinc-100 transition-colors hover:bg-[#2a3343]"
+                  >
+                    <Mic size={18} />
+                  </button>
+                  <button
+                    type="submit"
+                    disabled={!input.trim() || isLoading}
+                    className={cn(
+                      "p-2.5 rounded-full transition-all duration-300",
+                      input.trim() && !isLoading
+                        ? "bg-gradient-to-r from-blue-500 to-indigo-600 text-white shadow-lg"
+                        : "bg-[#2a3343] text-zinc-400"
+                    )}
+                  >
+                    <Send size={18} />
+                  </button>
+                </div>
               </div>
             </form>
           </div>
